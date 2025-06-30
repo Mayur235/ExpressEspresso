@@ -25,7 +25,7 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Copy Laravel application files
 COPY . /var/www/html
 
-# Update Apache configuration to serve the Laravel public directory
+# Update Apache configuration to serve Laravel public directory
 RUN sed -i 's|DocumentRoot /var/www/html|DocumentRoot /var/www/html/public|g' /etc/apache2/sites-available/000-default.conf \
  && echo "ServerName localhost" >> /etc/apache2/apache2.conf
 
@@ -40,9 +40,10 @@ RUN chown -R www-data:www-data /var/www/html \
 # Expose Apache port
 EXPOSE 80
 
-# Run config cache, migrations, seeders (ignore seed errors), then start Apache
+# Run config cache, migrations, seeders, storage link, then start Apache
 CMD php artisan config:clear \
  && php artisan config:cache \
  && php artisan migrate --force \
  && php artisan db:seed --force || echo "Seeding skipped (maybe already done)" \
+ && php artisan storage:link \
  && apache2-foreground
