@@ -1,17 +1,37 @@
+# Laravel folders to ignore
+/vendor
 /node_modules
-/public/build
-/public/hot
 /public/storage
 /storage/*.key
-/vendor
+/storage/oauth-private.key
+/storage/oauth-public.key
 .env
 .env.backup
 .phpunit.result.cache
 Homestead.json
 Homestead.yaml
 auth.json
+composer.lock
 npm-debug.log
 yarn-error.log
+
+# IDE/Editor specific
 /.idea
 /.vscode
-/sample
+
+# OS-generated files
+.DS_Store
+Thumbs.db
+
+# Logs and cache
+/storage/logs/*
+/bootstrap/cache/*
+
+# Exceptions to keep .gitignore placeholders
+!/storage/app/public/.gitignore
+!/storage/logs/.gitignore
+!/bootstrap/cache/.gitignore
+
+# Docker-specific
+docker-compose.override.yml
+Dockerfile.*
