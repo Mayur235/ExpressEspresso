@@ -16,21 +16,24 @@ RUN apt-get update && apt-get install -y \
     libzip-dev \
     && docker-php-ext-install pdo pdo_mysql zip
 
-# Enable Apache Rewrite Module
+# Enable Apache rewrite module
 RUN a2enmod rewrite
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Copy project files
+# Copy Laravel files into container
 COPY . /var/www/html
 
-# Set permissions
+# Install PHP dependencies with Composer
+RUN composer install --no-dev --optimize-autoloader
+
+# Set correct permissions
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html/storage
 
-# Expose port 80
+# Expose port
 EXPOSE 80
 
-# Run Laravel migrations automatically
+# Final command to run migrations and start Apache
 CMD php artisan config:cache && php artisan migrate --force && apache2-foreground
