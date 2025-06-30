@@ -1,7 +1,6 @@
 # Laravel folders to ignore
 /vendor
 /node_modules
-/public/storage
 /storage/*.key
 /storage/oauth-private.key
 /storage/oauth-public.key
@@ -28,9 +27,13 @@ Thumbs.db
 /bootstrap/cache/*
 
 # Exceptions to keep .gitignore placeholders
-!/storage/app/public/.gitignore
+!/storage/app/public
+!/storage/app/public/**
 !/storage/logs/.gitignore
 !/bootstrap/cache/.gitignore
+
+# Allow symlink to be tracked
+!public/storage
 
 # Docker-specific
 docker-compose.override.yml
