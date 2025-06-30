@@ -4,7 +4,7 @@ FROM php:8.2-apache
 # Set working directory
 WORKDIR /var/www/html
 
-# Install dependencies and PHP extensions
+# Install system dependencies and PHP extensions
 RUN apt-get update && apt-get install -y \
     git \
     unzip \
@@ -19,30 +19,30 @@ RUN apt-get update && apt-get install -y \
 # Enable Apache mod_rewrite for Laravel routing
 RUN a2enmod rewrite
 
-# Install Composer
+# Install Composer globally
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Copy app source
+# Copy Laravel application files
 COPY . /var/www/html
 
-# Set Laravel public folder as Apache's DocumentRoot
+# Update Apache configuration to serve the Laravel public directory
 RUN sed -i 's|DocumentRoot /var/www/html|DocumentRoot /var/www/html/public|g' /etc/apache2/sites-available/000-default.conf \
  && echo "ServerName localhost" >> /etc/apache2/apache2.conf
 
-# Install PHP dependencies including dev for seeding
-RUN composer install --optimize-autoloader --no-interaction --no-progress --no-scripts
+# Install Laravel dependencies (excluding dev for production)
+RUN composer install --no-dev --optimize-autoloader --no-interaction --no-progress --no-scripts
 
-# Ensure correct permissions
+# Set correct permissions for Laravel
 RUN chown -R www-data:www-data /var/www/html \
  && chmod -R 755 /var/www/html/storage \
  && chmod -R 755 /var/www/html/bootstrap/cache
 
-# Expose port 80
+# Expose Apache port
 EXPOSE 80
 
-# Entry point: clear cache, run migrations & seeders, then start Apache
+# Run config cache, migrations, seeders (ignore seed errors), then start Apache
 CMD php artisan config:clear \
  && php artisan config:cache \
  && php artisan migrate --force \
- && php artisan db:seed --force || true \
+ && php artisan db:seed --force || echo "Seeding skipped (maybe already done)" \
  && apache2-foreground
